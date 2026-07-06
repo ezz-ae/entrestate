@@ -1,0 +1,51 @@
+# AI Voice Landing Pages — the self-serve ad product
+
+The first sellable SKU (catalog #1), fully creatable from a user's Entrestate
+account: a landing page whose destination IS a live AI voice conversation
+about one listing, with the canvas personalizing on the spot. The user points
+their ad at the page URL; captured buyers land in their CRM.
+
+## User journey
+
+1. **Create** — `/me/voice-pages` ("Voice Pages" in the workspace nav):
+   listing details + call language (en/ar) + brand, prefilled from the Brand Kit.
+2. **Publish** — page goes live at `/v/[slug]`; copy the ad URL.
+3. **Advertise** — the URL is the ad destination (Meta/Google/TikTok).
+4. **Convert** — the buyer talks (voice or text) to the page's AI advisor;
+   the agent answers ONLY from the listing facts, steers the canvas
+   (`focus`: overview/price/payment/location/contact scroll + highlight),
+   and earns name + phone.
+5. **Lead** — captured server-side into `users/{uid}/leads` with
+   `source: 'voice-page'`, visible in `/me/leads`; `leadCount` shows in the studio.
+6. **Own domain** — save a domain on the page; DNS CNAME to the app host plus
+   registering the domain with hosting (SSL) makes the page serve at `/` of
+   that domain via `src/middleware.ts` host rewriting (`/v/~<host>`).
+
+## Pieces
+
+| Piece | Path |
+|---|---|
+| Model | `VoicePage`, `VoicePageListing` in `src/types.ts` |
+| Service (Firestore `voicePages`) | `src/services/voice-pages.ts` |
+| Buyer agent flow | `src/ai/flows/whitelabel/buyer-agent.ts` (+ `schemas.ts`) |
+| Owner CRUD APIs | `GET/POST /api/voice-pages`, `PATCH/DELETE /api/voice-pages/[id]` |
+| Public conversation API | `POST /api/voice-pages/agent` (loads page server-side; persists leads) |
+| Public page | `src/app/v/[slug]/` |
+| Studio | `src/app/me/voice-pages/page.tsx` |
+| Custom-domain routing | `src/middleware.ts` |
+
+## Guardrails
+
+- The client never supplies listing facts to the agent — the API loads the
+  page by slug server-side, so a visitor cannot puppet the brand's agent.
+- The agent may state only the listing facts; anything else becomes a
+  callback reason (which is the lead-capture moment by design).
+- Lead PII is persisted server-side and not echoed back in the API response.
+- Public lookups only ever return `published` pages; CRUD is owner-checked.
+
+## Next
+
+- AI minutes metering + page-level analytics (views → calls → leads).
+- Swap browser speech for the hosted voice stack when the kloom source lands.
+- Automated domain provisioning via the hosting API (today: DNS instructions).
+- Templates: create a page straight from a `projects_catalog` project.

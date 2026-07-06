@@ -10,6 +10,24 @@ The core mission is to solve the industry's fragmentation problem. Professionals
 
 ---
 
+## Products & Business
+
+Entrestate sells the platform as focused products — entitlement cuts of one
+codebase, each with a demo-led AI sales funnel. The map lives in
+[docs/README.md](./docs/README.md):
+
+-   **[AI Voice Landing Pages](./docs/VOICE-PAGES.md)** (shipped): create a
+    landing page in your account whose destination is a live AI voice call
+    about your listing — publish, point your ad at it, connect your own
+    domain, and captured buyers land in your CRM.
+-   **[The White-Label OS funnel](./docs/WHITELABEL-FUNNEL.md)** (shipped):
+    /pitch builds a prospect's fully-branded system live during an AI sales
+    call.
+-   **[Product Catalog](./docs/PRODUCT-CATALOG.md)**: all nine SKUs, the
+    pricing ladder, and the shipping order.
+
+---
+
 ## Core Architecture
 
 The system is built on a modular, event-driven architecture designed for scalability and extensibility.

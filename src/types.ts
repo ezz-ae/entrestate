@@ -125,3 +125,35 @@ export interface Tenant {
   expiresAt: number;
   claimedBy?: string | null;
 }
+
+// ─── AI Voice Landing Pages (self-serve ad product) ─────────────────────────
+
+export interface VoicePageListing {
+  title: string;
+  area: string;
+  city?: string;
+  price?: string;
+  bedrooms?: string;
+  handover?: string;
+  paymentPlan?: string;
+  description?: string;
+  highlights?: string[];
+}
+
+// A buyer-facing landing page with an in-page AI voice agent, created by a
+// user from their account and advertised directly (its URL is the ad's
+// destination). Public at /v/[slug] and optionally on a connected domain.
+export interface VoicePage {
+  id: string;
+  uid: string;
+  slug: string;
+  status: 'draft' | 'published';
+  locale: TenantLocale;
+  brand: TenantBrand;
+  listing: VoicePageListing;
+  /** Custom domain (host only, e.g. "offers.acme.ae") once connected. */
+  customDomain?: string | null;
+  createdAt: number;
+  updatedAt: number;
+  leadCount: number;
+}
