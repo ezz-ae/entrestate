@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import { ok, bad, fail } from '@/lib/api-helpers';
 import { buyerAgent } from '@/ai/flows/whitelabel/buyer-agent';
-import { addVoicePageLead, getPublishedVoicePageBySlug } from '@/services/voice-pages';
+import { addVoicePageLead, getPublishedVoicePageBySlug, recordAgentTurn } from '@/services/voice-pages';
 
 export const maxDuration = 30;
 
@@ -42,6 +42,8 @@ export async function POST(req: Request) {
       history,
       state,
     });
+
+    await recordAgentTurn(page);
 
     let leadCaptured = state.leadCaptured ?? false;
     if (output.action === 'capture_lead' && !leadCaptured && output.leadName && output.leadPhone) {

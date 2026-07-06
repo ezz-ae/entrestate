@@ -43,9 +43,18 @@ their ad at the page URL; captured buyers land in their CRM.
 - Lead PII is persisted server-side and not echoed back in the API response.
 - Public lookups only ever return `published` pages; CRUD is owner-checked.
 
+## Analytics & metering (shipped)
+
+- Per-page funnel counters: `views` → `calls` → `leadCount`, plus `turnCount`
+  (AI turns served). Beacon: `POST /api/voice-pages/track` (public,
+  best-effort, published pages only); turns metered server-side in the agent
+  API into `users/{uid}/usage/{YYYY-MM}.voiceTurns`
+  (`GET /api/voice-pages/usage` shows the month in the studio header).
+- The studio "New page" form can prefill from a market project
+  (`GET /api/voice-pages/projects?q=` prefix search over `projects_catalog`).
+
 ## Next
 
-- AI minutes metering + page-level analytics (views → calls → leads).
+- Price the AI tiers off `voiceTurns` and enforce quotas in the agent API.
 - Swap browser speech for the hosted voice stack when the kloom source lands.
 - Automated domain provisioning via the hosting API (today: DNS instructions).
-- Templates: create a page straight from a `projects_catalog` project.

@@ -156,4 +156,9 @@ export interface VoicePage {
   createdAt: number;
   updatedAt: number;
   leadCount: number;
+  /** Analytics counters (best-effort, incremented server-side). */
+  views?: number;
+  calls?: number;
+  /** Total AI conversation turns served — the usage/pricing meter. */
+  turnCount?: number;
 }

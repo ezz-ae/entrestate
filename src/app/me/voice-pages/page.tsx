@@ -13,12 +13,16 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Copy,
   ExternalLink,
+  Eye,
   Globe,
   Loader2,
   Mic,
+  PhoneCall,
   Plus,
+  Search,
   Trash2,
   Users,
+  Zap,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -75,6 +79,10 @@ export default function VoicePagesStudio() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [domainDrafts, setDomainDrafts] = useState<Record<string, string>>({});
+  const [usage, setUsage] = useState<{ month: string; voiceTurns: number } | null>(null);
+  const [projectQuery, setProjectQuery] = useState('');
+  const [projectResults, setProjectResults] = useState<any[]>([]);
+  const [searchingProjects, setSearchingProjects] = useState(false);
 
   const authedFetch = useCallback(
     async (url: string, init: RequestInit = {}) => {
@@ -99,10 +107,12 @@ export default function VoicePagesStudio() {
     if (!user) return;
     (async () => {
       try {
-        const [pageList, profile] = await Promise.all([
+        const [pageList, profile, usageData] = await Promise.all([
           authedFetch('/api/voice-pages'),
           authedFetch('/api/user/profile').catch(() => ({})),
+          authedFetch('/api/voice-pages/usage').catch(() => null),
         ]);
+        setUsage(usageData);
         setPages(pageList || []);
         // Prefill brand from the user's Brand Kit so a page is one form away.
         setForm((f) => ({
@@ -120,6 +130,33 @@ export default function VoicePagesStudio() {
       }
     })();
   }, [user, authedFetch, toast]);
+
+  const searchProjects = async () => {
+    const q = projectQuery.trim();
+    if (q.length < 2) return;
+    setSearchingProjects(true);
+    try {
+      setProjectResults(await authedFetch(`/api/voice-pages/projects?q=${encodeURIComponent(q)}`));
+    } catch {
+      setProjectResults([]);
+    } finally {
+      setSearchingProjects(false);
+    }
+  };
+
+  const prefillFromProject = (proj: any) => {
+    setForm((f) => ({
+      ...f,
+      title: proj.name || f.title,
+      area: proj.area || f.area,
+      city: proj.city || f.city,
+      price: proj.priceFrom ? String(proj.priceFrom) : f.price,
+      bedrooms: Array.isArray(proj.unitTypes) ? proj.unitTypes.join(', ') : f.bedrooms,
+      handover: proj.handover || f.handover,
+    }));
+    setProjectResults([]);
+    setProjectQuery('');
+  };
 
   const createPage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,13 +260,58 @@ export default function VoicePagesStudio() {
             The page your ad points at. It talks to your buyer and drops leads into your CRM.
           </p>
         </div>
-        <Button onClick={() => setShowForm((s) => !s)}>
-          <Plus className="me-1.5 h-4 w-4" /> New page
-        </Button>
+        <div className="flex items-center gap-3">
+          {usage && (
+            <span className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs text-muted-foreground">
+              <Zap className="h-3.5 w-3.5" /> {usage.voiceTurns} AI turns · {usage.month}
+            </span>
+          )}
+          <Button onClick={() => setShowForm((s) => !s)}>
+            <Plus className="me-1.5 h-4 w-4" /> New page
+          </Button>
+        </div>
       </div>
 
       {showForm && (
         <form onSubmit={createPage} className="mt-6 space-y-4 rounded-2xl border p-5">
+          <div className="rounded-xl bg-muted/40 p-3">
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Search className="h-3.5 w-3.5" /> Prefill from a market project (optional)
+            </p>
+            <div className="flex items-center gap-2">
+              <Input
+                className="h-9 max-w-xs"
+                placeholder="Search project name…"
+                value={projectQuery}
+                onChange={(e) => setProjectQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    void searchProjects();
+                  }
+                }}
+              />
+              <Button type="button" size="sm" variant="outline" onClick={searchProjects} disabled={searchingProjects}>
+                {searchingProjects ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Search'}
+              </Button>
+            </div>
+            {projectResults.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {projectResults.map((proj) => (
+                  <button
+                    key={proj.id}
+                    type="button"
+                    onClick={() => prefillFromProject(proj)}
+                    className="block w-full rounded-md border bg-background px-3 py-1.5 text-start text-xs hover:bg-muted"
+                  >
+                    <span className="font-medium">{proj.name}</span>
+                    <span className="text-muted-foreground"> · {proj.area || proj.city || ''}{proj.developer ? ` · ${proj.developer}` : ''}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <p className="text-sm font-semibold">Listing</p>
           <div className="grid gap-3 sm:grid-cols-2">
             {field('Title', 'title', 'Marina Vista Tower B', true)}
@@ -327,8 +409,19 @@ export default function VoicePagesStudio() {
                 <Badge variant={p.status === 'published' ? 'default' : 'secondary'}>
                   {p.status}
                 </Badge>
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Users className="h-3.5 w-3.5" /> {p.leadCount ?? 0}
+                <span className="flex items-center gap-2.5 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1" title="Page views">
+                    <Eye className="h-3.5 w-3.5" /> {p.views ?? 0}
+                  </span>
+                  <span className="flex items-center gap-1" title="Calls started">
+                    <PhoneCall className="h-3.5 w-3.5" /> {p.calls ?? 0}
+                  </span>
+                  <span className="flex items-center gap-1" title="Leads captured">
+                    <Users className="h-3.5 w-3.5" /> {p.leadCount ?? 0}
+                  </span>
+                  <span className="flex items-center gap-1" title="AI turns served">
+                    <Zap className="h-3.5 w-3.5" /> {p.turnCount ?? 0}
+                  </span>
                 </span>
               </div>
 

@@ -7,6 +7,7 @@
  * captured leads flow into the owner's existing CRM at users/{uid}/leads.
  */
 
+import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebaseAdmin';
 import type { VoicePage, VoicePageListing, TenantBrand, TenantLocale } from '@/types';
 
@@ -135,5 +136,43 @@ export async function addVoicePageLead(
     note: lead.note ?? '',
     createdAt: new Date(),
   });
-  await db.collection(COLLECTION).doc(page.id).update({ leadCount: (page.leadCount ?? 0) + 1 });
+  await db.collection(COLLECTION).doc(page.id).update({ leadCount: FieldValue.increment(1) });
+}
+
+/** Best-effort analytics counter (page views / call starts). */
+export async function trackVoicePageEvent(slug: string, event: 'view' | 'call'): Promise<boolean> {
+  const db = requireDb();
+  const snap = await db.collection(COLLECTION).where('slug', '==', slug).limit(1).get();
+  if (snap.empty) return false;
+  const page = snap.docs[0].data() as VoicePage;
+  if (page.status !== 'published') return false;
+  await snap.docs[0].ref.update({ [event === 'view' ? 'views' : 'calls']: FieldValue.increment(1) });
+  return true;
+}
+
+/**
+ * Meter one AI conversation turn: bumps the page's turnCount and the owner's
+ * monthly usage doc (users/{uid}/usage/{YYYY-MM}). This is the number AI
+ * pricing is based on.
+ */
+export async function recordAgentTurn(page: VoicePage): Promise<void> {
+  const db = requireDb();
+  const month = new Date().toISOString().slice(0, 7);
+  await Promise.all([
+    db.collection(COLLECTION).doc(page.id).update({ turnCount: FieldValue.increment(1) }),
+    db
+      .collection('users')
+      .doc(page.uid)
+      .collection('usage')
+      .doc(month)
+      .set({ voiceTurns: FieldValue.increment(1), updatedAt: Date.now() }, { merge: true }),
+  ]);
+}
+
+/** Current-month usage for the studio header. */
+export async function getMonthlyUsage(uid: string): Promise<{ month: string; voiceTurns: number }> {
+  const db = requireDb();
+  const month = new Date().toISOString().slice(0, 7);
+  const doc = await db.collection('users').doc(uid).collection('usage').doc(month).get();
+  return { month, voiceTurns: (doc.data()?.voiceTurns as number) ?? 0 };
 }

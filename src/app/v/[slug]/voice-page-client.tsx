@@ -90,11 +90,25 @@ export default function VoicePageClient({ page }: { page: VoicePage }) {
     '--vp-accent': page.brand.colors.accent,
   } as React.CSSProperties;
 
+  const track = useCallback(
+    (event: 'view' | 'call') => {
+      // best-effort beacon; failures must never affect the visitor
+      fetch('/api/voice-pages/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: page.slug, event }),
+        keepalive: true,
+      }).catch(() => {});
+    },
+    [page.slug],
+  );
+
   useEffect(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     setVoiceSupported(!!SR);
     window.speechSynthesis?.getVoices();
-  }, []);
+    track('view');
+  }, [track]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -189,6 +203,7 @@ export default function VoicePageClient({ page }: { page: VoicePage }) {
 
   const startCall = () => {
     setStarted(true);
+    track('call');
     void agentTurn([]);
   };
 
