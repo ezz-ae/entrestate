@@ -29,10 +29,11 @@ client's domain/brand. Backed by the market catalog + `api.listings_feed`
 (live in Neon; ORE's landing-page engine is the reference implementation).
 - **Ship:** data feed + branded page renderer per tenant. Medium lift.
 
-### 3. From-Site Multi-Styles
-Point the brand scraper at any site → N alternative branded site themes,
-previewable instantly (the provisioning morph engine, run N times).
-- **Ship:** small lift. Great top-of-funnel freebie or low-cost SKU.
+### 3. From-Site Multi-Styles — SHIPPED
+Free tool at `/styles`: paste a site URL → four art directions (faithful,
+dark-luxury, minimal-light, bold-modern) rendered as live mini-site previews,
+each CTA'ing into /pitch. Flow: `whitelabel/multi-styles.ts`;
+API: `POST /api/whitelabel/styles`.
 
 ## Demand generation
 
@@ -69,7 +70,7 @@ AI call that builds it live (docs/WHITELABEL-FUNNEL.md).
 
 | Tier | Contents | Anchor |
 |---|---|---|
-| Voice Pages | 1 (+3 preview) | entry, self-serve |
+| Voice Pages | 1 (+3, live at /styles) | entry, self-serve |
 | Growth | 1 + 2 + (4 or 5) | most campaigns land here |
 | Brokerage | + 6 + 7 + both ads managers | team seat pricing |
 | OS / Empire | everything incl. 8, own domain | the full-server sale |

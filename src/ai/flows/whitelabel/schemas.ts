@@ -115,3 +115,37 @@ export const BuyerAgentOutputSchema = z.object({
   leadNote: z.string().optional().describe('One-line summary of what the buyer wants, for the CRM.'),
 });
 export type BuyerAgentOutput = z.infer<typeof BuyerAgentOutputSchema>;
+
+// ── multi-styles (From-Site Multi-Styles) ────────────────────────────────────
+
+export const MultiStylesInputSchema = z.object({
+  companyName: z.string().optional().describe('Company name if known (falls back to the site title).'),
+  sourceUrl: z.string().optional(),
+  siteTitle: z.string().optional(),
+  siteDescription: z.string().optional(),
+  siteText: z.string().optional().describe('Visible text scraped from the site.'),
+  colorCandidates: z.array(z.string()).optional().describe('Hex colors seen in the page source, most frequent first.'),
+  locale: z.enum(['en', 'ar']),
+});
+export type MultiStylesInput = z.infer<typeof MultiStylesInputSchema>;
+
+export const MultiStylesOutputSchema = z.object({
+  companyName: z.string().describe('Clean, properly-cased company name.'),
+  styles: z
+    .array(
+      z.object({
+        name: z.string().describe("Short style name, e.g. 'Midnight Luxe', 'Desert Minimal'."),
+        vibe: z.string().describe('One sentence describing the style direction.'),
+        primary: z.string().describe('Primary color hex. Strong enough to work as a UI theme.'),
+        accent: z.string().describe('Accent color hex, complementary to the primary.'),
+        surface: z.string().describe('Background surface color hex (dark or light, per the style).'),
+        dark: z.boolean().describe('True if the surface is dark and text should be light.'),
+        tagline: z.string().describe('A brand tagline in this style voice, in the requested locale.'),
+        heroTitle: z.string().describe('A hero headline for their homepage in this style, in the requested locale.'),
+        heroSubtitle: z.string().describe('One supporting hero sentence, in the requested locale.'),
+      }),
+    )
+    .length(4)
+    .describe('Exactly 4 clearly distinct style directions: one faithful to their current brand, one dark-luxury, one minimal-light, one bold-modern.'),
+});
+export type MultiStylesOutput = z.infer<typeof MultiStylesOutputSchema>;
