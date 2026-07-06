@@ -19,7 +19,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the PDF editing flow.
  */
-export const EditPdfInputSchema = z.object({
+const EditPdfInputSchema = z.object({
   /**
    * The source PDF document, encoded as a Base64 data URI.
    * @example "data:application/pdf;base64,..."
@@ -59,7 +59,7 @@ const ExecutionStepSchema = z.object({
 /**
  * Defines the schema for the output of the PDF editing plan generation flow.
  */
-export const EditPdfOutputSchema = z.object({
+const EditPdfOutputSchema = z.object({
   /**
    * A human-readable summary of the plan.
    */

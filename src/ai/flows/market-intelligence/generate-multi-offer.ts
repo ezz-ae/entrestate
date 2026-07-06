@@ -20,7 +20,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the multi-offer generation flow.
  */
-export const GenerateMultiOfferInputSchema = z.object({
+const GenerateMultiOfferInputSchema = z.object({
   properties: z.string().describe('A list of property addresses, one per line.'),
   clientInfo: z.string().describe('Basic information about the client (e.g., name, budget).'),
   terms: z.string().describe('Key offer terms to include for comparison.'),
@@ -30,7 +30,7 @@ export type GenerateMultiOfferInput = z.infer<typeof GenerateMultiOfferInputSche
 /**
  * Defines the schema for the output of the multi-offer generation flow.
  */
-export const GenerateMultiOfferOutputSchema = z.object({
+const GenerateMultiOfferOutputSchema = z.object({
   offerPackageDataUri: z
     .string()
     .describe(

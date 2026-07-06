@@ -19,7 +19,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the landing page generation flow.
  */
-export const GenerateLandingPageInputSchema = z.object({
+const GenerateLandingPageInputSchema = z.object({
   /**
    * The name of the project.
    */
@@ -69,7 +69,7 @@ export type GenerateLandingPageInput = z.infer<
 /**
  * Defines the schema for the output of the landing page generation flow.
  */
-export const GenerateLandingPageOutputSchema = z.object({
+const GenerateLandingPageOutputSchema = z.object({
   /**
    * The generated HTML content for the landing page.
    */

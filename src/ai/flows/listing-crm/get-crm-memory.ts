@@ -20,7 +20,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the CRM memory flow.
  */
-export const GetCrmMemoryInputSchema = z.object({
+const GetCrmMemoryInputSchema = z.object({
   clientName: z.string().describe('The name of the client to query.'),
   query: z.string().describe('The specific question about the client.'),
 });
@@ -29,7 +29,7 @@ export type GetCrmMemoryInput = z.infer<typeof GetCrmMemoryInputSchema>;
 /**
  * Defines the schema for the output of the CRM memory flow.
  */
-export const GetCrmMemoryOutputSchema = z.object({
+const GetCrmMemoryOutputSchema = z.object({
   summary: z
     .string()
     .describe('A summary of the requested information about the client.'),

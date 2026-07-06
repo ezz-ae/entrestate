@@ -16,7 +16,7 @@ import { z } from 'zod';
 /**
  * Defines the schema for the input of the commission calculator flow.
  */
-export const CommissionCalculatorInputSchema = z.object({
+const CommissionCalculatorInputSchema = z.object({
   salePrice: z.number().positive().describe('The total sale price of the property.'),
   commissionRate: z.number().positive().describe('The total commission percentage (e.g., 2 for 2%).'),
   agentSplit: z.number().min(0).max(100).describe('The agent\'s share of the commission (e.g., 50 for 50%).'),
@@ -26,7 +26,7 @@ export type CommissionCalculatorInput = z.infer<typeof CommissionCalculatorInput
 /**
  * Defines the schema for the output of the commission calculator flow.
  */
-export const CommissionCalculatorOutputSchema = z.object({
+const CommissionCalculatorOutputSchema = z.object({
   totalCommission: z.number().describe('The total commission amount generated from the sale.'),
   yourShare: z.number().describe("The agent's take-home amount from the commission."),
   brokerageShare: z.number().describe("The brokerage's share of the commission."),

@@ -17,7 +17,7 @@ import fetch from 'node-fetch';
 /**
  * Defines the input schema for the PayPal transaction tool.
  */
-export const GetPaypalTransactionInputSchema = z.object({
+const GetPaypalTransactionInputSchema = z.object({
   transactionId: z.string().describe('The ID of the PayPal transaction to retrieve.'),
 });
 export type GetPaypalTransactionInput = z.infer<typeof GetPaypalTransactionInputSchema>;
@@ -26,7 +26,7 @@ export type GetPaypalTransactionInput = z.infer<typeof GetPaypalTransactionInput
  * Defines the output schema for the PayPal transaction tool.
  * This is a simplified schema for demonstration.
  */
-export const GetPaypalTransactionOutputSchema = z.object({
+const GetPaypalTransactionOutputSchema = z.object({
   id: z.string(),
   status: z.string(),
   amount: z.object({

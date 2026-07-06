@@ -19,7 +19,7 @@ import fetch from 'node-fetch';
  * Defines the schema for the input of the Bayut sync flow.
  * This mirrors the fields required by the Bayut API.
  */
-export const SyncBayutListingInputSchema = z.object({
+const SyncBayutListingInputSchema = z.object({
     listingReferenceNo: z.string().describe("The unique reference number for the listing."),
     propertyTitle: z.string().describe("The title of the property listing."),
     propertyDescription: z.string().describe("The detailed description of the property."),
@@ -37,7 +37,7 @@ export type SyncBayutListingInput = z.infer<typeof SyncBayutListingInputSchema>;
 /**
  * Defines the schema for the output of the sync flow.
  */
-export const SyncBayutListingOutputSchema = z.object({
+const SyncBayutListingOutputSchema = z.object({
     success: z.boolean().describe("Whether the API call was successful."),
     message: z.string().describe("A message from the API response."),
     referenceNumber: z.string().optional().describe("The reference number of the synced listing."),

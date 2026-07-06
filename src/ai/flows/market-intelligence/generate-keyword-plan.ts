@@ -16,7 +16,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the keyword plan generation flow.
  */
-export const GenerateKeywordPlanInputSchema = z.object({
+const GenerateKeywordPlanInputSchema = z.object({
   topic: z.string().describe('The central topic or product for the keyword plan (e.g., "luxury villas in Dubai Hills").'),
   targetLocation: z.string().describe('The geographical target for the ads (e.g., "Dubai, UAE").'),
 });
@@ -38,7 +38,7 @@ const AdGroupSchema = z.object({
 /**
  * Defines the schema for the output of the keyword plan generation flow.
  */
-export const GenerateKeywordPlanOutputSchema = z.object({
+const GenerateKeywordPlanOutputSchema = z.object({
   planTitle: z.string().describe('A descriptive title for the overall keyword plan.'),
   adGroups: z.array(AdGroupSchema).describe('A list of logically grouped ad groups with their keywords.'),
   negativeKeywords: z.array(z.string()).describe('A list of recommended negative keywords to exclude.'),

@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 // Define the structured input for the lease reviewer flow
-export const LeaseReviewerInputSchema = z.object({
+const LeaseReviewerInputSchema = z.object({
   leaseDocumentUri: z
     .string()
     .describe(
@@ -31,7 +31,7 @@ const ClauseAnalysisSchema = z.object({
 });
 
 // Define the structured output for the review
-export const LeaseReviewerOutputSchema = z.object({
+const LeaseReviewerOutputSchema = z.object({
   overallSummary: z.string().describe("A high-level summary of the lease's fairness and any major red flags."),
   analysis: z.array(ClauseAnalysisSchema).describe("A detailed, clause-by-clause analysis of the document."),
 });

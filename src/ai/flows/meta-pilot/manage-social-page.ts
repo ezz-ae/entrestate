@@ -20,7 +20,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the page admin flow.
  */
-export const ManageSocialPageInputSchema = z.object({
+const ManageSocialPageInputSchema = z.object({
   task: z
     .string()
     .describe(
@@ -38,7 +38,7 @@ export type ManageSocialPageInput = z.infer<typeof ManageSocialPageInputSchema>;
 /**
  * Defines the schema for the output of the page admin flow.
  */
-export const ManageSocialPageOutputSchema = z.object({
+const ManageSocialPageOutputSchema = z.object({
   status: z.string().describe('A status update on the performed task.'),
   result: z
     .string()

@@ -18,7 +18,7 @@ import { z } from 'zod';
 /**
  * Defines the schema for the input of the UGC script writer flow.
  */
-export const UgcScriptWriterInputSchema = z.object({
+const UgcScriptWriterInputSchema = z.object({
   topic: z.string().describe('The subject of the video (e.g., a property, a market trend, a service).'),
   vibe: z.string().describe('The desired tone and style of the script (e.g., "Exciting & Upbeat", "Authentic & Relatable", "Luxurious & Exclusive").'),
   hookStyle: z.string().describe('The style of the opening hook to grab attention (e.g., "Question-based", "Problem/Solution", "Surprising Stat").'),
@@ -28,7 +28,7 @@ export type UgcScriptWriterInput = z.infer<typeof UgcScriptWriterInputSchema>;
 /**
  * Defines the schema for the output of the UGC script writer flow.
  */
-export const UgcScriptWriterOutputSchema = z.object({
+const UgcScriptWriterOutputSchema = z.object({
   scripts: z.array(
     z.object({
       hook: z.string().describe("The opening line designed to capture attention."),

@@ -1,5 +1,6 @@
 
-'use server';
+// Server-side only Firebase Admin singletons. Deliberately NOT a 'use server'
+// module: that directive is for Server Actions and forbids object exports.
 
 import { getApps, initializeApp, applicationDefault, App } from 'firebase-admin/app';
 import { getAuth, Auth } from 'firebase-admin/auth';

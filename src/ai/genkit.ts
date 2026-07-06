@@ -1,4 +1,5 @@
-'use server';
+// Server-side Genkit singleton. Deliberately NOT a 'use server' module: that
+// directive is for Server Actions and forbids object exports like `ai`.
 
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/googleai';

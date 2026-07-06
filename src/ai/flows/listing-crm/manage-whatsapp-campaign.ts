@@ -19,7 +19,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the WhatsApp campaign management flow.
  */
-export const ManageWhatsAppCampaignInputSchema = z.object({
+const ManageWhatsAppCampaignInputSchema = z.object({
   contactsDataUri: z
     .string()
     .describe(
@@ -43,7 +43,7 @@ export type ManageWhatsAppCampaignInput = z.infer<
 /**
  * Defines the schema for the output of the WhatsApp campaign management flow.
  */
-export const ManageWhatsAppCampaignOutputSchema = z.object({
+const ManageWhatsAppCampaignOutputSchema = z.object({
   status: z
     .string()
     .describe(

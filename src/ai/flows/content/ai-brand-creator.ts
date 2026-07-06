@@ -19,7 +19,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the ai brand creator flow.
  */
-export const AiBrandCreatorInputSchema = z.object({
+const AiBrandCreatorInputSchema = z.object({
   /**
    * The user's command or instruction.
    * @example "Set up my brand and projects from the uploaded files."
@@ -39,7 +39,7 @@ export type AiBrandCreatorInput = z.infer<typeof AiBrandCreatorInputSchema>;
 /**
  * Defines the schema for the output of the ai brand creator flow.
  */
-export const AiBrandCreatorOutputSchema = z.object({
+const AiBrandCreatorOutputSchema = z.object({
   /**
    * The extracted brand information.
    */

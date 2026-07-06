@@ -19,7 +19,7 @@ import { googleAI } from '@genkit-ai/googleai';
 /**
  * Defines the schema for the input of the TikTok video generation flow.
  */
-export const GenerateTikTokVideoInputSchema = z.object({
+const GenerateTikTokVideoInputSchema = z.object({
   projectId: z.string().describe('The ID of the project to use for visual assets.'),
   sound: z.string().describe('The trending sound or vibe to use for the video.'),
   textOverlays: z.string().describe('Engaging text to overlay on the video, separated by newlines.'),
@@ -29,7 +29,7 @@ export type GenerateTikTokVideoInput = z.infer<typeof GenerateTikTokVideoInputSc
 /**
  * Defines the schema for the output of the TikTok video generation flow.
  */
-export const GenerateTikTokVideoOutputSchema = z.object({
+const GenerateTikTokVideoOutputSchema = z.object({
   tiktokVideoDataUri: z
     .string()
     .describe(

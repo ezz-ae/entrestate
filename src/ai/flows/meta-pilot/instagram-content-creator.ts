@@ -19,7 +19,7 @@ const HashtagStrategySchema = z.object({
 });
 
 // Input schema for the flow
-export const InstagramContentCreatorInputSchema = z.object({
+const InstagramContentCreatorInputSchema = z.object({
   topic: z.string().describe("The central topic, property name, or URL to base the content on."),
   platform: z.enum(['Instagram', 'Facebook', 'LinkedIn', 'X']).default('Instagram').describe("The target social media platform."),
 });
@@ -27,7 +27,7 @@ export type InstagramContentCreatorInput = z.infer<typeof InstagramContentCreato
 
 
 // Output schema for the flow
-export const InstagramContentCreatorOutputSchema = z.object({
+const InstagramContentCreatorOutputSchema = z.object({
   posts: z.array(DailyPostSchema).describe("A unique, engaging post for each day of the week (Monday to Sunday)."),
   hashtagStrategy: HashtagStrategySchema,
 });

@@ -108,3 +108,9 @@ export const MetaAutoPilotOutputSchema = z.object({
 });
 export type MetaAutoPilotInput = z.infer<typeof MetaAutoPilotInputSchema>;
 export type MetaAutoPilotOutput = z.infer<typeof MetaAutoPilotOutputSchema>;
+
+// Schema for Deal Analyzer (`deal-analyzer`) — lives here (not in the
+// 'use server' flow module) so client forms can import it for validation.
+export const DealAnalyzerInputSchema = z.object({
+  propertyAddress: z.string().describe("The full address of the property to analyze."),
+});
