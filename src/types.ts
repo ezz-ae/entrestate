@@ -84,3 +84,44 @@ export interface Feature {
 export type FilterCategory = 'All' | 'Marketing' | 'Lead Gen' | 'Creative' | 'Sales Tools' | 'Social & Comms' | 'Web' | 'Editing' | 'Ads' | 'Market Intelligence' | 'CRM' | 'Developer' | 'Market Library' | 'Video';
 export type BadgeType = 'NEW' | 'AUTO' | 'DEPRECATED';
 export type Suite = 'Meta Marketing Suite' | 'Web Development Lab' | 'AI Listing Portal' | 'AI Creative Studio' | 'Marketing Management' | 'Lead Intelligence AI' | 'Google Ads Suite' | 'Core AI' | 'Utility';
+
+// ─── White-label tenants (sold via the /pitch AI-call funnel) ───────────────
+
+export type TenantStatus = 'provisioning' | 'live' | 'claimed' | 'expired';
+export type TenantLocale = 'en' | 'ar';
+
+// Everything needed to render the system under the prospect's brand.
+export interface TenantBrand {
+  companyName: string;
+  tagline?: string;
+  logoUrl?: string | null;
+  colors: { primary: string; accent: string; background?: string };
+  contact?: { name?: string; phone?: string; email?: string; whatsapp?: string };
+  locale: TenantLocale;
+  /** Where the brand was learned from (prospect's site / instagram). */
+  sourceUrl?: string;
+}
+
+export interface TenantListing {
+  id: string;
+  title: string;
+  area: string;
+  price?: string;
+  bedrooms?: string;
+  imageUrl?: string;
+  /** true when scraped from the prospect's own site, false for seeded demo data */
+  fromProspect: boolean;
+}
+
+export interface Tenant {
+  id: string;
+  /** URL-safe handle: /demo/[slug] today, [slug].entrestate.com later. */
+  slug: string;
+  status: TenantStatus;
+  brand: TenantBrand;
+  listings: TenantListing[];
+  /** Millis. Demo tenants expire unless claimed. */
+  createdAt: number;
+  expiresAt: number;
+  claimedBy?: string | null;
+}

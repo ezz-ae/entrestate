@@ -1,0 +1,73 @@
+/**
+ * Zod schemas for the white-label funnel flows. Kept out of the 'use server'
+ * flow modules because that directive only permits async-function exports.
+ */
+
+import { z } from 'genkit';
+
+// ── extract-brand ────────────────────────────────────────────────────────────
+
+export const ExtractBrandInputSchema = z.object({
+  companyName: z.string().describe("The prospect's company name as they said it."),
+  sourceUrl: z.string().optional().describe('The website that was scraped.'),
+  siteTitle: z.string().optional(),
+  siteDescription: z.string().optional(),
+  siteText: z.string().optional().describe('Visible text scraped from their site.'),
+  colorCandidates: z.array(z.string()).optional().describe('Hex colors seen in their page source, most frequent first.'),
+  locale: z.enum(['en', 'ar']).describe('Language of the sales conversation.'),
+});
+export type ExtractBrandInput = z.infer<typeof ExtractBrandInputSchema>;
+
+export const ExtractBrandOutputSchema = z.object({
+  companyName: z.string().describe('Clean, properly-cased company name.'),
+  tagline: z.string().describe('A short premium tagline for this brokerage, in the conversation locale. Invent a fitting one if the site has none.'),
+  primaryColor: z.string().describe('Primary brand color as a hex code. Prefer a color from the candidates that looks like a brand color; otherwise pick one that suits a premium real estate brand.'),
+  accentColor: z.string().describe('Accent color as a hex code, complementary to the primary.'),
+  contactPhone: z.string().optional().describe('Phone number found on the site, if any.'),
+  contactEmail: z.string().optional().describe('Email found on the site, if any.'),
+  listings: z
+    .array(
+      z.object({
+        title: z.string(),
+        area: z.string().describe('Neighbourhood/community name.'),
+        price: z.string().optional().describe('Price as displayed, with currency.'),
+        bedrooms: z.string().optional(),
+      }),
+    )
+    .describe('Up to 6 real listings/projects found in the site text. Empty array if none found.'),
+});
+export type ExtractBrandOutput = z.infer<typeof ExtractBrandOutputSchema>;
+
+// ── seller-agent ─────────────────────────────────────────────────────────────
+
+export const SellerAgentInputSchema = z.object({
+  locale: z.enum(['en', 'ar']).describe('Conversation language.'),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['agent', 'prospect']),
+        text: z.string(),
+      }),
+    )
+    .describe('Conversation so far, oldest first. Empty on the opening turn.'),
+  state: z.object({
+    companyName: z.string().optional().describe('Company name once known.'),
+    websiteUrl: z.string().optional().describe('Website/Instagram once known.'),
+    provisioning: z.boolean().optional().describe('True while their system is being built.'),
+    tenantSlug: z.string().optional().describe('Set once their branded system is live.'),
+    provisionFailed: z.boolean().optional().describe('True if the last provisioning attempt failed.'),
+  }),
+});
+export type SellerAgentInput = z.infer<typeof SellerAgentInputSchema>;
+
+export const SellerAgentOutputSchema = z.object({
+  reply: z.string().describe('What the agent says next, in the conversation locale. 1–3 short spoken sentences. No markdown, no emoji.'),
+  action: z
+    .enum(['none', 'provision', 'reveal', 'close'])
+    .describe(
+      "'provision' the moment BOTH company name and website are known and no system exists yet. 'reveal' when tenantSlug is set and you are presenting their system. 'close' when inviting them to claim it. Otherwise 'none'.",
+    ),
+  companyName: z.string().optional().describe('Company name extracted from the conversation, when first understood.'),
+  websiteUrl: z.string().optional().describe('Website or Instagram handle extracted from the conversation, when first understood.'),
+});
+export type SellerAgentOutput = z.infer<typeof SellerAgentOutputSchema>;
