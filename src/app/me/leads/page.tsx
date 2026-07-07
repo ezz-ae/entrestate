@@ -33,14 +33,36 @@ import { formatDistanceToNow } from 'date-fns';
 type Lead = {
     id: string;
     name: string;
-    email: string;
-    status: string;
-    interest_level: string;
-    source: string;
-    lastContacted: string;
-    assigned_to: string;
+    email?: string;
+    phone?: string;
+    status?: string;
+    interest_level?: string;
+    source?: string;
+    lastContacted?: string;
+    assigned_to?: string;
     property?: string;
+    /** Written by AI Voice Landing Pages */
+    listingTitle?: string;
+    note?: string;
+    createdAt?: unknown;
 };
+
+// Leads come from several writers (manual form, voice pages) with different
+// date shapes: ISO strings, millis, or Firestore Timestamp JSON. Never crash
+// the table over a date.
+function leadWhen(lead: Lead): string {
+    const raw: any = lead.lastContacted ?? lead.createdAt;
+    if (!raw) return '—';
+    let d: Date;
+    if (typeof raw === 'object' && raw !== null && '_seconds' in raw) d = new Date(raw._seconds * 1000);
+    else d = new Date(raw);
+    if (isNaN(d.getTime())) return '—';
+    try {
+        return formatDistanceToNow(d, { addSuffix: true });
+    } catch {
+        return '—';
+    }
+}
 
 
 const statusVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
@@ -230,17 +252,21 @@ export default function LeadsPage() {
                         <TableRow key={lead.id}>
                             <TableCell className="font-medium">
                                 <div className="font-medium">{lead.name}</div>
-                                <div className="text-xs text-muted-foreground">{lead.email}</div>
+                                <div className="text-xs text-muted-foreground">{lead.email || lead.phone || ''}</div>
                             </TableCell>
                             <TableCell>
-                            <Badge variant={statusVariant[lead.status] || 'secondary'}>{lead.status}</Badge>
+                            <Badge variant={statusVariant[lead.status || ''] || 'secondary'}>{lead.status || 'New'}</Badge>
                             </TableCell>
                             <TableCell>
-                            <Badge variant={interestVariant[lead.interest_level] || 'outline'}>{lead.interest_level}</Badge>
+                            {lead.interest_level ? (
+                                <Badge variant={interestVariant[lead.interest_level] || 'outline'}>{lead.interest_level}</Badge>
+                            ) : (
+                                <span className="text-muted-foreground">—</span>
+                            )}
                             </TableCell>
-                            <TableCell>{lead.source}</TableCell>
-                            <TableCell className="hidden md:table-cell">{lead.property || 'N/A'}</TableCell>
-                            <TableCell className="hidden md:table-cell">{formatDistanceToNow(new Date(lead.lastContacted), { addSuffix: true })}</TableCell>
+                            <TableCell>{lead.source === 'voice-page' ? <Badge variant="outline">AI voice page</Badge> : (lead.source || '—')}</TableCell>
+                            <TableCell className="hidden md:table-cell">{lead.property || lead.listingTitle || 'N/A'}</TableCell>
+                            <TableCell className="hidden md:table-cell">{leadWhen(lead)}</TableCell>
                             <TableCell className="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
