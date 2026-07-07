@@ -72,8 +72,19 @@ When the owner quota is hit the buyer agent politely degrades to the page's
 contact details; the pricing tiers plug in by setting `WL_OWNER_TURNS_MONTHLY`
 per plan (or replacing the env lookup with a per-user plan lookup).
 
+## Revenue capture & brand sites (shipped)
+
+- `/pricing?claim=[tenantSlug]` shows the claim banner: the prospect's demo,
+  a name/phone/email form → `POST /api/whitelabel/claim` stores the intent in
+  `claims` (status `new`) and flips the tenant to `claimed` (expiry stops).
+- Every provisioned /pitch demo is logged to `pitchSessions` — claimed or
+  not, it's a sales lead for Entrestate's own pipeline.
+- `/b/[brandSlug]` — a brand's public mini-site: all its published voice
+  pages under one shareable URL (link shown in the studio header).
+
 ## Next
 
 - Per-plan quota lookup (replace the global env with the user's tier).
+- Ops view for `claims` + `pitchSessions` (today: read via Firestore console).
 - Swap browser speech for the hosted voice stack when the kloom source lands.
 - Automated domain provisioning via the hosting API (today: DNS instructions).

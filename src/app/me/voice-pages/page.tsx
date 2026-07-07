@@ -312,6 +312,18 @@ export default function VoicePagesStudio() {
           <p className="mt-1 text-sm text-muted-foreground">
             The page your ad points at. It talks to your buyer and drops leads into your CRM.
           </p>
+          {(() => {
+            const bs = pages.find((p) => p.status === 'published' && p.brandSlug)?.brandSlug;
+            return bs ? (
+              <p className="mt-1 text-sm">
+                Your brand site:{' '}
+                <a href={`/b/${bs}`} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">
+                  /b/{bs}
+                </a>{' '}
+                <span className="text-muted-foreground">— all your published pages, one link.</span>
+              </p>
+            ) : null;
+          })()}
         </div>
         <div className="flex items-center gap-3">
           {usage && (

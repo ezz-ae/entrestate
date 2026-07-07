@@ -153,6 +153,8 @@ export interface VoicePage {
   listing: VoicePageListing;
   /** Custom domain (host only, e.g. "offers.acme.ae") once connected. */
   customDomain?: string | null;
+  /** Groups pages of one brand at /b/[brandSlug]. Derived from companyName. */
+  brandSlug?: string;
   createdAt: number;
   updatedAt: number;
   leadCount: number;

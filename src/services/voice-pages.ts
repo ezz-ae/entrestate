@@ -46,6 +46,7 @@ export async function createVoicePage(
     id: ref.id,
     uid,
     slug,
+    brandSlug: toSlug(input.brand.companyName),
     status: 'draft',
     locale: input.locale,
     brand: input.brand,
@@ -105,7 +106,9 @@ export async function updateVoicePage(
   if (typeof patch.customDomain === 'string') {
     patch.customDomain = patch.customDomain.toLowerCase().replace(/^www\./, '').split(':')[0] || null;
   }
-  await ref.update({ ...patch, updatedAt: Date.now() } as Record<string, unknown>);
+  const extra: Record<string, unknown> = {};
+  if (patch.brand?.companyName) extra.brandSlug = toSlug(patch.brand.companyName);
+  await ref.update({ ...patch, ...extra, updatedAt: Date.now() } as Record<string, unknown>);
   return (await ref.get()).data() as VoicePage;
 }
 
@@ -175,4 +178,23 @@ export async function getMonthlyUsage(uid: string): Promise<{ month: string; voi
   const month = new Date().toISOString().slice(0, 7);
   const doc = await db.collection('users').doc(uid).collection('usage').doc(month).get();
   return { month, voiceTurns: (doc.data()?.voiceTurns as number) ?? 0 };
+}
+
+/**
+ * Public: all published pages of one brand (equality filters only, so no
+ * composite index is required). Pages are grouped by the first page's owner
+ * to keep one /b/ URL from mixing two accounts that share a company name.
+ */
+export async function listPublishedPagesByBrand(brandSlug: string): Promise<VoicePage[]> {
+  const db = requireDb();
+  const snap = await db
+    .collection(COLLECTION)
+    .where('brandSlug', '==', brandSlug.toLowerCase())
+    .where('status', '==', 'published')
+    .limit(50)
+    .get();
+  const pages = snap.docs.map((d) => d.data() as VoicePage);
+  if (!pages.length) return [];
+  const owner = pages[0].uid;
+  return pages.filter((p) => p.uid === owner).sort((a, b) => b.updatedAt - a.updatedAt);
 }

@@ -14,6 +14,7 @@ import { scrapeSite } from '@/lib/whitelabel/scrape';
 import { seedListings } from '@/lib/whitelabel/seed-listings';
 import { extractBrand } from '@/ai/flows/whitelabel/extract-brand';
 import { createTenant, markTenantLive } from '@/services/tenants';
+import { adminDb } from '@/lib/firebaseAdmin';
 import { LIMITS, checkRateLimit, requestIp, tooMany } from '@/lib/whitelabel/rate-limit';
 import type { TenantBrand, TenantListing, TenantLocale } from '@/types';
 
@@ -69,6 +70,21 @@ export async function POST(req: Request) {
     const tenant = await createTenant(brand);
     const listings = seedListings(prospectListings);
     await markTenantLive(tenant.id, brand, listings);
+
+    // Every provisioned demo is a hot lead for Entrestate's own pipeline,
+    // claimed or not. Best-effort — never blocks the reveal.
+    try {
+      await adminDb?.collection('pitchSessions').add({
+        tenantId: tenant.id,
+        tenantSlug: tenant.slug,
+        companyName: brand.companyName,
+        websiteUrl: brand.sourceUrl ?? null,
+        locale,
+        listingsFound: prospectListings.length,
+        status: 'demo_live',
+        createdAt: Date.now(),
+      });
+    } catch {}
 
     return ok({ tenant: { ...tenant, status: 'live', listings } });
   } catch (error) {
