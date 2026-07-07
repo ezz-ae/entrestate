@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ai } from '@/ai/genkit';
+import { getUidFromRequest } from '@/lib/api-helpers';
+import { checkRateLimit, tooMany } from '@/lib/whitelabel/rate-limit';
 
 // Import all flow functions directly here
 import { generateAdFromBrochure } from '@/ai/flows/meta-pilot/generate-ad-from-brochure';
@@ -120,6 +122,12 @@ const nextActionMap: Record<string, { toolId: string; title: string; description
 
 
 export async function POST(req: NextRequest) {
+  // This endpoint dispatches ~50 server-side AI flows; it must never be public.
+  const uid = await getUidFromRequest(req);
+  if (!uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const rl = await checkRateLimit(`run:uid:${uid}`, 60, 600); // 60 flow runs / 10 min / user
+  if (!rl.allowed) return tooMany(rl.retryAfterSec);
+
   let body;
   try {
     body = await req.json();

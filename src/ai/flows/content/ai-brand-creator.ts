@@ -13,13 +13,14 @@
  * @export {type} AiBrandCreatorOutput - The Zod schema for the output of the aiBrandCreator flow.
  */
 
+import { googleAI } from '@genkit-ai/googleai';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 /**
  * Defines the schema for the input of the ai brand creator flow.
  */
-export const AiBrandCreatorInputSchema = z.object({
+const AiBrandCreatorInputSchema = z.object({
   /**
    * The user's command or instruction.
    * @example "Set up my brand and projects from the uploaded files."
@@ -39,7 +40,7 @@ export type AiBrandCreatorInput = z.infer<typeof AiBrandCreatorInputSchema>;
 /**
  * Defines the schema for the output of the ai brand creator flow.
  */
-export const AiBrandCreatorOutputSchema = z.object({
+const AiBrandCreatorOutputSchema = z.object({
   /**
    * The extracted brand information.
    */
@@ -106,7 +107,7 @@ const aiBrandCreatorPrompt = ai.definePrompt({
   name: 'aiBrandCreatorPrompt',
   input: {schema: AiBrandCreatorInputSchema},
   output: {schema: AiBrandCreatorOutputSchema},
-  model: 'gemini-1.5-pro-preview',
+  model: googleAI.model('gemini-2.5-flash'),
   prompt: `You are an expert system administrator for the Super Seller Suite. Your task is to configure the user's workspace based on their command and the documents they provide.
 
   User Command: "{{{command}}}"

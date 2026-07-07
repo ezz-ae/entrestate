@@ -13,7 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { track } from '@/lib/events';
 import { PageHeader } from '@/components/ui/page-header';
 import { useAuth } from '@/hooks/useAuth';
-import { dealAnalyzer, DealAnalyzerInputSchema, DealAnalyzerOutput } from '@/ai/flows/market-intelligence/deal-analyzer';
+import { dealAnalyzer, DealAnalyzerOutput } from '@/ai/flows/market-intelligence/deal-analyzer';
+import { DealAnalyzerInputSchema } from '@/ai/flows/types';
 
 const ToolPage = () => {
   const [isLoading, setIsLoading] = React.useState(false);

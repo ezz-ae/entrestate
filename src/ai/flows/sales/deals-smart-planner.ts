@@ -16,7 +16,7 @@ import { z } from 'zod';
 /**
  * Defines the schema for the input of the Deals Smart Planner flow.
  */
-export const DealsSmartPlannerInputSchema = z.object({
+const DealsSmartPlannerInputSchema = z.object({
   goal: z.string().describe('The user\'s primary objective, e.g., "Plan a deal", "Follow up on a lead".'),
   userContext: z.string().optional().describe('Information about the user\'s current situation or a previous step\'s result.'),
   userStrengths: z.array(z.string()).optional().describe('A list of the user\'s skills or assets, e.g., "strong on TikTok", "speaks Chinese", "has a large WhatsApp contact list".'),
@@ -37,7 +37,7 @@ const PlanStepSchema = z.object({
 /**
  * Defines the schema for the output of the Deals Smart Planner flow.
  */
-export const DealsSmartPlannerOutputSchema = z.object({
+const DealsSmartPlannerOutputSchema = z.object({
   nextStep: PlanStepSchema.describe("The next logical step for the user to take in their deal plan."),
 });
 export type DealsSmartPlannerOutput = z.infer<typeof DealsSmartPlannerOutputSchema>;

@@ -19,7 +19,7 @@ import { googleAI } from '@genkit-ai/googleai';
 /**
  * Defines the schema for the input of the story generation flow.
  */
-export const GenerateStoryInputSchema = z.object({
+const GenerateStoryInputSchema = z.object({
   projectId: z.string().describe('The ID of the project to use for photo assets.'),
   vibe: z.string().describe('The desired vibe for the story (e.g., "Modern", "Luxury").'),
   callToAction: z.string().describe('The call to action text for the end of the story.'),
@@ -29,7 +29,7 @@ export type GenerateStoryInput = z.infer<typeof GenerateStoryInputSchema>;
 /**
  * Defines the schema for the output of the story generation flow.
  */
-export const GenerateStoryOutputSchema = z.object({
+const GenerateStoryOutputSchema = z.object({
   storyVideoDataUri: z
     .string()
     .describe(

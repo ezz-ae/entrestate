@@ -1,8 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminAuth } from '@/lib/firebaseAdmin';
 // In a real application, you would import Genkit's internal flow management APIs here.
 // import { listFlows, deployFlow, updateFlow } from 'genkit/internal/flow-management';
 
+async function isAdmin(req: NextRequest): Promise<boolean> {
+  if (!adminAuth) return false;
+  const allow = (process.env.ENTRESTATE_ADMIN_EMAILS || '')
+    .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+  if (!allow.length) return false;
+  try {
+    const token = req.headers.get('Authorization')?.split('Bearer ')[1];
+    if (!token) return false;
+    const decoded = await adminAuth.verifyIdToken(token);
+    return !!decoded.email && allow.includes(decoded.email.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: NextRequest) {
+  if (!(await isAdmin(req))) {
+    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  }
   try {
     const { action, flowId, payload } = await req.json();
 

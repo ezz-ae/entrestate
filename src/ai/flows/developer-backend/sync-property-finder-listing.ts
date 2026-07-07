@@ -26,7 +26,7 @@ const ImageSchema = z.object({
  * Defines the schema for the input of the Property Finder sync flow.
  * This mirrors the fields required by the Property Finder XML structure.
  */
-export const SyncPropertyFinderListingInputSchema = z.object({
+const SyncPropertyFinderListingInputSchema = z.object({
     listingReferenceNo: z.string().describe("The unique reference number for the listing."),
     propertyTitle: z.string().describe("The title of the property listing."),
     propertyDescription: z.string().describe("The detailed description of the property."),
@@ -39,7 +39,7 @@ export type SyncPropertyFinderListingInput = z.infer<typeof SyncPropertyFinderLi
 /**
  * Defines the schema for the output of the sync flow.
  */
-export const SyncPropertyFinderListingOutputSchema = z.object({
+const SyncPropertyFinderListingOutputSchema = z.object({
     success: z.boolean().describe("Whether the API call was successful."),
     message: z.string().describe("A message from the API response."),
     referenceNumber: z.string().optional().describe("The reference number of the synced listing."),

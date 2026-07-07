@@ -14,13 +14,14 @@
  * @export {type} GenerateMultiOfferOutput - The Zod schema for the output.
  */
 
+import { googleAI } from '@genkit-ai/googleai';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 /**
  * Defines the schema for the input of the multi-offer generation flow.
  */
-export const GenerateMultiOfferInputSchema = z.object({
+const GenerateMultiOfferInputSchema = z.object({
   properties: z.string().describe('A list of property addresses, one per line.'),
   clientInfo: z.string().describe('Basic information about the client (e.g., name, budget).'),
   terms: z.string().describe('Key offer terms to include for comparison.'),
@@ -30,7 +31,7 @@ export type GenerateMultiOfferInput = z.infer<typeof GenerateMultiOfferInputSche
 /**
  * Defines the schema for the output of the multi-offer generation flow.
  */
-export const GenerateMultiOfferOutputSchema = z.object({
+const GenerateMultiOfferOutputSchema = z.object({
   offerPackageDataUri: z
     .string()
     .describe(
@@ -43,7 +44,7 @@ const generateMultiOfferPrompt = ai.definePrompt({
     name: 'generateMultiOfferPrompt',
     input: { schema: GenerateMultiOfferInputSchema },
     output: { schema: GenerateMultiOfferOutputSchema },
-    model: 'gemini-1.5-pro-preview',
+    model: googleAI.model('gemini-2.5-flash'),
     prompt: `You are a real estate analyst creating a comparison document.
     Generate a professional, clean, side-by-side comparison PDF document based on the following information.
     The PDF should have a title, a brief summary for the client, and a table comparing the properties based on the specified terms.

@@ -21,9 +21,7 @@ import {z} from 'genkit';
  * Defines the schema for the input of the deal analyzer flow.
  * Now simplified to only require a property address.
  */
-export const DealAnalyzerInputSchema = z.object({
-  propertyAddress: z.string().describe("The full address of the property to analyze."),
-});
+import { DealAnalyzerInputSchema } from '@/ai/flows/types';
 export type DealAnalyzerInput = z.infer<typeof DealAnalyzerInputSchema>;
 
 
@@ -31,7 +29,7 @@ export type DealAnalyzerInput = z.infer<typeof DealAnalyzerInputSchema>;
  * Defines the schema for the output of the deal analyzer flow.
  * It now includes the data fetched by the data agent.
  */
-export const DealAnalyzerOutputSchema = z.object({
+const DealAnalyzerOutputSchema = z.object({
   fetchedData: z.object({
     estimatedValue: z.number(),
     estimatedMonthlyRent: z.number(),

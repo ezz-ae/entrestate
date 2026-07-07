@@ -19,7 +19,7 @@ import { googleAI } from '@genkit-ai/googleai';
 /**
  * Defines the schema for the input of the reel generation flow.
  */
-export const GenerateReelInputSchema = z.object({
+const GenerateReelInputSchema = z.object({
   projectId: z.string().describe('The ID of the project to use for assets. In a real app, you would use this to fetch images.'),
   sellingPoints: z.string().describe('Key selling points for text overlays, separated by newlines.'),
   vibe: z.string().describe('The desired vibe for the reel, influencing music and editing style.'),
@@ -29,7 +29,7 @@ export type GenerateReelInput = z.infer<typeof GenerateReelInputSchema>;
 /**
  * Defines the schema for the output of the reel generation flow.
  */
-export const GenerateReelOutputSchema = z.object({
+const GenerateReelOutputSchema = z.object({
   reelVideoDataUri: z
     .string()
     .describe(

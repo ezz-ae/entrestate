@@ -15,12 +15,12 @@ import { tools } from '@/lib/tools-data';
 // Dynamically generate the list of tool titles for the schema
 const toolTitles = tools.map(t => t.title);
 
-export const SmartInputRouterInputSchema = z.object({
+const SmartInputRouterInputSchema = z.object({
   query: z.string().describe("The user's text input from the main workspace command bar."),
 });
 export type SmartInputRouterInput = z.infer<typeof SmartInputRouterInputSchema>;
 
-export const SmartInputRouterOutputSchema = z.object({
+const SmartInputRouterOutputSchema = z.object({
   intent: z.enum(['Search', 'Command', 'Post']).describe("The AI's classification of the user's intent."),
   toolId: z.string().optional().describe("If the intent is 'Command', this is the ID of the most relevant tool to run."),
   reasoning: z.string().describe("A brief explanation of why the AI chose this intent and/or tool."),

@@ -5,7 +5,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 // Define the structured input for the market report flow
-export const MarketReportInputSchema = z.object({
+const MarketReportInputSchema = z.object({
   location: z.string().describe("The specific location for the report (e.g., 'Dubai Marina', 'Downtown Dubai')."),
   audience: z.enum(['Investor', 'Buyer', 'Seller']).describe("The target audience for the report, which will tailor the narrative."),
 });
@@ -13,7 +13,7 @@ export type MarketReportInput = z.infer<typeof MarketReportInputSchema>;
 
 
 // Define the structured output for the report
-export const MarketReportOutputSchema = z.object({
+const MarketReportOutputSchema = z.object({
   title: z.string().describe("A compelling title for the report."),
   executiveSummary: z.string().describe("A concise, high-level overview of the market."),
   keyMarketTrends: z.array(z.string()).describe("A list of 3-5 key trends impacting the area."),

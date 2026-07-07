@@ -15,7 +15,7 @@ import { z } from 'zod';
 /**
  * Defines the schema for the input of the AlloyDB scanner flow.
  */
-export const ScanForAlloyDBInputSchema = z.object({
+const ScanForAlloyDBInputSchema = z.object({
   scanContext: z.string().describe('A description of the environment to scan, such as project details, IP ranges, or existing database types.'),
 });
 export type ScanForAlloyDBInput = z.infer<typeof ScanForAlloyDBInputSchema>;
@@ -31,7 +31,7 @@ const DatabaseInstanceSchema = z.object({
 /**
  * Defines the schema for the output of the AlloyDB scanner flow.
  */
-export const ScanForAlloyDBOutputSchema = z.object({
+const ScanForAlloyDBOutputSchema = z.object({
   summary: z.string().describe('A high-level summary of the scan results.'),
   instances: z.array(DatabaseInstanceSchema).describe('A list of detected database instances and their analysis.'),
 });

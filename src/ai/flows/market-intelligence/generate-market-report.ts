@@ -20,7 +20,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the market report flow.
  */
-export const GenerateMarketReportInputSchema = z.object({
+const GenerateMarketReportInputSchema = z.object({
   location: z.string().describe('The city or neighborhood for the report.'),
   propertyType: z.string().describe('The specific property type to focus on (e.g., "luxury condos").'),
   reportType: z.enum(['Investor', 'Home Buyer', 'Seller']).describe('The target audience for the report.'),
@@ -30,7 +30,7 @@ export type GenerateMarketReportInput = z.infer<typeof GenerateMarketReportInput
 /**
  * Defines the schema for the output of the market report flow.
  */
-export const GenerateMarketReportOutputSchema = z.object({
+const GenerateMarketReportOutputSchema = z.object({
   reportTitle: z.string().describe('A compelling title for the report.'),
   executiveSummary: z.string().describe('A brief, high-level summary of the key findings.'),
   marketTrends: z.array(z.object({

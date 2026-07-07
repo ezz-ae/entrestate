@@ -19,7 +19,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the brochure translation flow.
  */
-export const TranslateBrochureInputSchema = z.object({
+const TranslateBrochureInputSchema = z.object({
   /**
    * The source brochure document, encoded as a Base64 data URI.
    * @example "data:application/pdf;base64,..."
@@ -41,7 +41,7 @@ export type TranslateBrochureInput = z.infer<typeof TranslateBrochureInputSchema
 /**
  * Defines the schema for the output of the brochure translation flow.
  */
-export const TranslateBrochureOutputSchema = z.object({
+const TranslateBrochureOutputSchema = z.object({
   /**
    * The translated brochure document, returned as a Base64 data URI.
    */

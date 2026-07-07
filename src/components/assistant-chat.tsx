@@ -53,21 +53,24 @@ export function AssistantChat() {
     setIsLoading(true);
 
     try {
+        if (!user) throw new Error('Please sign in to use the assistant.');
+        const idToken = await user.getIdToken();
         const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
             body: JSON.stringify({ text: input, history: chatHistory }),
         });
 
-        if (!response.ok) {
-            throw new Error('The AI is experiencing some turbulence. Please try again.');
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data?.ok) {
+            throw new Error(data?.error || 'The AI is experiencing some turbulence. Please try again.');
         }
 
-        const data = await response.json();
-        const aiResponse: Message = { from: 'ai', text: data.text };
-        
+        const replyText: string = data.data?.text ?? '';
+        const aiResponse: Message = { from: 'ai', text: replyText };
+
         setMessages(prev => [...prev, aiResponse]);
-        setChatHistory(prev => [...prev, { role: 'user', content: [{ text: userMessage.text }] }, { role: 'model', content: [{ text: aiResponse.text }] }]);
+        setChatHistory(prev => [...prev, { role: 'user', text: userMessage.text }, { role: 'model', text: replyText }]);
     } catch(err: any) {
         const errorResponse: Message = { from: 'ai', text: err.message };
         setMessages(prev => [...prev, errorResponse]);

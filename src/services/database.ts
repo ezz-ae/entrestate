@@ -8,7 +8,11 @@
  * needing to refactor the entire application.
  */
 
-'use server';
+// Server-only data layer. Deliberately NOT a 'use server' module: that
+// directive would compile every export into a PUBLIC Server Action endpoint
+// callable with an attacker-chosen userId. Call these only from authenticated
+// API routes (which derive uid from the verified token), never from client code.
+import 'server-only';
 
 import { adminDb } from '@/lib/firebaseAdmin';
 import { fail } from '@/lib/api-helpers';

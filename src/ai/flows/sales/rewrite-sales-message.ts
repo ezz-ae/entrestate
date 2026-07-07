@@ -15,7 +15,7 @@ import { z } from 'zod';
 /**
  * Defines the schema for the input of the message rewriter flow.
  */
-export const RewriteSalesMessageInputSchema = z.object({
+const RewriteSalesMessageInputSchema = z.object({
   originalMessage: z.string().min(5, 'The message must be at least 5 characters long.').describe('The original sales message written by the user.'),
   tone: z.enum(['More Professional', 'More Friendly & Casual', 'Create Urgency', 'More Persuasive', 'Shorten & Simplify']).describe('The desired tone or strategy for the rewritten message.'),
 });
@@ -24,7 +24,7 @@ export type RewriteSalesMessageInput = z.infer<typeof RewriteSalesMessageInputSc
 /**
  * Defines the schema for the output of the message rewriter flow.
  */
-export const RewriteSalesMessageOutputSchema = z.object({
+const RewriteSalesMessageOutputSchema = z.object({
   rewrittenMessages: z.array(
     z.object({
       strategy: z.string().describe("The specific strategy applied for this version (e.g., 'Added a Clear Call-to-Action')."),

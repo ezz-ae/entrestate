@@ -4,7 +4,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LogOut, Settings, GanttChartSquare, User as UserIcon, LayoutDashboard, Compass, Workflow, FolderCog, Library } from 'lucide-react';
+import { LogOut, Settings, GanttChartSquare, User as UserIcon, LayoutDashboard, Compass, Workflow, FolderCog, Library, Mic } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { auth } from '@/lib/firebase';
 import { Logo } from '@/components/logo';
@@ -23,6 +23,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuL
 const mainNavLinks = [
   { href: '/me/workspace', label: 'Workspace', icon: <LayoutDashboard /> },
   { href: '/me/marketing', label: 'Marketplace', icon: <Compass /> },
+  { href: '/me/voice-pages', label: 'Voice Pages', icon: <Mic /> },
   { href: '/me/flows', label: 'Flows', icon: <Workflow /> },
   { href: '/me/brand', label: 'Brand & Assets', icon: <FolderCog /> },
   { href: '/me/tool/prompt-library', label: 'Prompt Library', icon: <Library /> },

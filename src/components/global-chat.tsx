@@ -2,6 +2,7 @@
 
 'use client';
 
+import { useAuth } from '@/hooks/useAuth';
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Bot, Send, Loader2, User, Sparkles, PlusCircle, Copy, Workflow, ArrowLeft, ArrowRight, Settings2 } from 'lucide-react';
@@ -41,6 +42,7 @@ type ActionKey = {
 
 export function GlobalChat() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     { from: 'ai', text: <InitialAssistantMessage /> },
@@ -100,9 +102,11 @@ export function GlobalChat() {
       if (!isSheetOpen) setIsSheetOpen(true);
 
       try {
+        if (!user) throw new Error('Please sign in to use the assistant.');
+        const idToken = await user.getIdToken();
         const response = await fetch('/api/run', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
             body: JSON.stringify({ 
                 toolId: 'smart-input-router',
                 payload: { query: text }

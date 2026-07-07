@@ -20,7 +20,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the payment plan generation flow.
  */
-export const GeneratePaymentPlanInputSchema = z.object({
+const GeneratePaymentPlanInputSchema = z.object({
   projectId: z
     .string()
     .describe('The ID of the project from the user\'s library.'),
@@ -48,7 +48,7 @@ const MilestoneSchema = z.object({
 /**
  * Defines the schema for the output of the payment plan generation flow.
  */
-export const GeneratePaymentPlanOutputSchema = z.object({
+const GeneratePaymentPlanOutputSchema = z.object({
   planName: z.string().describe('A descriptive name for the generated plan.'),
   planDescription: z
     .string()

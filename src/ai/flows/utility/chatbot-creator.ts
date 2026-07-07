@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 // Define the input schema for creating the chatbot
-export const ChatbotCreatorInputSchema = z.object({
+const ChatbotCreatorInputSchema = z.object({
   projectName: z.string().describe('The name of the project the chatbot will represent.'),
   welcomeMessage: z.string().optional().describe('A custom welcome message for the chatbot.'),
   primaryColor: z.string().optional().describe('The primary color for the chatbot widget (hex code).'),
@@ -21,7 +21,7 @@ export const ChatbotCreatorInputSchema = z.object({
 export type ChatbotCreatorInput = z.infer<typeof ChatbotCreatorInputSchema>;
 
 // Define the output schema, which will be the embed code
-export const ChatbotCreatorOutputSchema = z.object({
+const ChatbotCreatorOutputSchema = z.object({
   embedCode: z.string().describe('The HTML and JavaScript snippet to embed the chatbot on a website.'),
   previewUrl: z.string().optional().describe('A URL to a standalone page to preview the chatbot.'),
 });

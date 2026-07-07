@@ -20,7 +20,7 @@ import {z} from 'genkit';
 /**
  * Defines the schema for the input of the email campaign creation flow.
  */
-export const CreateEmailCampaignInputSchema = z.object({
+const CreateEmailCampaignInputSchema = z.object({
   goal: z
     .string()
     .describe(
@@ -42,7 +42,7 @@ export type CreateEmailCampaignInput = z.infer<
 /**
  * Defines the schema for the output of the email campaign creation flow.
  */
-export const CreateEmailCampaignOutputSchema = z.object({
+const CreateEmailCampaignOutputSchema = z.object({
   emails: z
     .array(
       z.object({

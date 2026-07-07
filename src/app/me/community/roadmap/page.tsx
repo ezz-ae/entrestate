@@ -17,7 +17,7 @@ const roadmapItems = {
         { title: "Interactive 3D Property Tours", description: "Generate and embed interactive 3D tours from floor plans." },
     ],
     'Completed': [
-        { title: "Full AI Tool Suite Implementation", description: "All core AI tools are now fully functional and deployed." },
+        { title: "AI Voice Landing Pages", description: "Create an AI voice-call landing page for any listing, publish it, and capture leads into your CRM." },
         { title: "Intelligent Discover Engine", description: "The core search is now powered by a reasoning AI model." },
         { title: "User Authentication & Onboarding Flow", description: "Complete user registration and a guided setup experience." },
     ],
