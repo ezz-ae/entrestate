@@ -79,11 +79,14 @@ export default function VoicePageClient({ page }: { page: VoicePage }) {
   const [logoBroken, setLogoBroken] = useState(false);
 
   const recognitionRef = useRef<any>(null);
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<Msg[]>([]);
   const capturedRef = useRef(false);
+  const thinkingRef = useRef(false);
   messagesRef.current = messages;
   capturedRef.current = leadCaptured;
+  thinkingRef.current = thinking;
 
   const vars = {
     '--vp-primary': page.brand.colors.primary,
@@ -119,21 +122,40 @@ export default function VoicePageClient({ page }: { page: VoicePage }) {
     document.getElementById(`vp-${focus}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [focus, started]);
 
+  // Detach the active utterance's handlers before cancelling, so an
+  // intentional cancel never fires onend -> startListening (which would open
+  // the mic while the next reply speaks and make the agent hear itself).
+  const stopSpeaking = useCallback(() => {
+    if (utterRef.current) {
+      utterRef.current.onend = null;
+      utterRef.current.onerror = null;
+      utterRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+  }, []);
+
   const speak = useCallback(
     (text: string, onDone?: () => void) => {
       if (!window.speechSynthesis) return onDone?.();
-      window.speechSynthesis.cancel();
+      stopSpeaking();
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = locale === 'ar' ? 'ar-SA' : 'en-US';
       const voice = (window.speechSynthesis.getVoices() || []).find((v) =>
         v.lang.toLowerCase().startsWith(locale === 'ar' ? 'ar' : 'en'),
       );
       if (voice) utter.voice = voice;
-      utter.onend = () => onDone?.();
-      utter.onerror = () => onDone?.();
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        onDone?.();
+      };
+      utter.onend = finish;
+      utter.onerror = finish;
+      utterRef.current = utter;
       window.speechSynthesis.speak(utter);
     },
-    [locale],
+    [locale, stopSpeaking],
   );
 
   const startListening = useCallback(() => {
@@ -147,7 +169,9 @@ export default function VoicePageClient({ page }: { page: VoicePage }) {
       rec.onresult = (e: any) => {
         const text = e.results?.[0]?.[0]?.transcript?.trim();
         setListening(false);
-        if (text) void buyerSays(text);
+        // Ignore input captured while a turn is already in flight, so two
+        // concurrent agentTurns can't overwrite each other's message list.
+        if (text && !thinkingRef.current) void buyerSays(text);
       };
       rec.onerror = () => setListening(false);
       rec.onend = () => setListening(false);
@@ -193,13 +217,21 @@ export default function VoicePageClient({ page }: { page: VoicePage }) {
 
   const buyerSays = useCallback(
     async (text: string) => {
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
       const history: Msg[] = [...messagesRef.current, { role: 'buyer', text }];
       setMessages(history);
       await agentTurn(history);
     },
-    [agentTurn],
+    [agentTurn, stopSpeaking],
   );
+
+  // Stop the mic and TTS on unmount so nothing keeps running after navigation.
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.abort?.();
+      stopSpeaking();
+    };
+  }, [stopSpeaking]);
 
   const startCall = () => {
     setStarted(true);

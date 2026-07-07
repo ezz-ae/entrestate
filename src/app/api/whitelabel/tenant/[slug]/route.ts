@@ -13,7 +13,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   try {
     const tenant = await getTenantBySlug(slug);
     if (!tenant) return bad('Tenant not found.', 404);
-    return ok({ tenant });
+    // Public endpoint: never expose the claimer's phone number (claimedBy).
+    const { claimedBy, ...safe } = tenant;
+    return ok({ tenant: safe });
   } catch (error) {
     return fail(error);
   }

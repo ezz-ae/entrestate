@@ -18,4 +18,9 @@ if (!getApps().length) {
 
 export const adminApp: App = app;
 export const adminAuth: Auth = getAuth(app);        // ✅ non-null
-export const adminDb: Firestore = getFirestore(app); // ✅ non-null
+const db: Firestore = getFirestore(app);
+// Optional fields (tagline, phone, price, handover…) are frequently undefined;
+// without this, ref.set/.add throws "Cannot use 'undefined' as a Firestore value",
+// which would crash tenant provisioning and voice-page creation on most inputs.
+try { db.settings({ ignoreUndefinedProperties: true }); } catch { /* already initialized */ }
+export const adminDb: Firestore = db; // ✅ non-null

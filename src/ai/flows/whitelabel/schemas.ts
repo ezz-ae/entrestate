@@ -46,9 +46,10 @@ export const SellerAgentInputSchema = z.object({
     .array(
       z.object({
         role: z.enum(['agent', 'prospect']),
-        text: z.string(),
+        text: z.string().max(2000),
       }),
     )
+    .max(60)
     .describe('Conversation so far, oldest first. Empty on the opening turn.'),
   state: z.object({
     companyName: z.string().optional().describe('Company name once known.'),

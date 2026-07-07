@@ -53,6 +53,35 @@ their ad at the page URL; captured buyers land in their CRM.
 - The studio "New page" form can prefill from a market project
   (`GET /api/voice-pages/projects?q=` prefix search over `projects_catalog`).
 
+## Audit fixes (shipped)
+
+Adversarial multi-agent audit of this surface; confirmed defects fixed:
+
+- **CRITICAL** Firestore rejected `undefined` field values, crashing tenant
+  provisioning and voice-page creation for any unset optional field. Enabled
+  `ignoreUndefinedProperties` at init (`firebaseAdmin.ts`) — fixes the whole class.
+- **HIGH** TTS-cancel fired `onend` → reopened the mic while the next reply was
+  speaking, so the agent transcribed its own voice and looped (billed turns).
+  Utterance handlers are now detached before any cancel (both /pitch and /v).
+- **HIGH** Buyer mic input is ignored while a turn is in flight (no more
+  concurrent turns erasing each other's messages); both clients clean up mic +
+  TTS on unmount.
+- **MEDIUM** Public tenant endpoint no longer returns the claimer's phone.
+- **MEDIUM** Voice-page PATCH restricted to status/locale/customDomain — the
+  free-form brand/listing maps could wipe required fields.
+- **MEDIUM** Custom domains are now uniqueness-checked (takeover guard).
+- **HIGH** Seller-agent history capped (per-message 2000 chars, 60 turns).
+
+## Known-open (tracked, not yet fixed)
+
+- Rate-limit keys use the leftmost `X-Forwarded-For` hop, spoofable depending on
+  the host; harden once the production proxy's trusted header is known.
+- `rateLimits` docs accumulate; add a scheduled purge or Firestore TTL policy
+  (needs `resetAt` as a Timestamp).
+- Slug reservation is check-then-write (no transaction); low collision odds at
+  current volume, but should move into a transaction before scale.
+- Locale toggle mid-call doesn't rebind the running recognition loop.
+
 ## Rate limits & quotas (shipped)
 
 All public endpoints are limited via a Firestore fixed-window limiter

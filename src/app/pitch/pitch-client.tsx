@@ -133,6 +133,7 @@ export default function PitchClient() {
   const [logoBroken, setLogoBroken] = useState(false);
 
   const recognitionRef = useRef<any>(null);
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const stateRef = useRef<AgentState>({});
   const messagesRef = useRef<Msg[]>([]);
@@ -156,23 +157,41 @@ export default function PitchClient() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, thinking]);
 
+  // Detach the active utterance's handlers before cancelling so an intentional
+  // cancel never fires onend -> startListening (mic opening over the next reply).
+  const stopSpeaking = useCallback(() => {
+    if (utterRef.current) {
+      utterRef.current.onend = null;
+      utterRef.current.onerror = null;
+      utterRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+  }, []);
+
   const speak = useCallback(
     (text: string, onDone?: () => void) => {
       if (!voiceOn || !window.speechSynthesis) {
         onDone?.();
         return;
       }
-      window.speechSynthesis.cancel();
+      stopSpeaking();
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = locale === 'ar' ? 'ar-SA' : 'en-US';
       const voice = pickVoice(locale);
       if (voice) utter.voice = voice;
       utter.rate = 1.02;
-      utter.onend = () => onDone?.();
-      utter.onerror = () => onDone?.();
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        onDone?.();
+      };
+      utter.onend = finish;
+      utter.onerror = finish;
+      utterRef.current = utter;
       window.speechSynthesis.speak(utter);
     },
-    [voiceOn, locale],
+    [voiceOn, locale, stopSpeaking],
   );
 
   const startListening = useCallback(() => {
@@ -293,12 +312,12 @@ export default function PitchClient() {
 
   const prospectSays = useCallback(
     async (text: string) => {
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
       const history: Msg[] = [...messagesRef.current, { role: 'prospect', text }];
       setMessages(history);
       await agentTurn(history, stateRef.current);
     },
-    [agentTurn],
+    [agentTurn, stopSpeaking],
   );
 
   const startCall = useCallback(() => {

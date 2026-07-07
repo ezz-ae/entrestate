@@ -104,7 +104,15 @@ export async function updateVoicePage(
   const doc = await ref.get();
   if (!doc.exists || (doc.data() as VoicePage).uid !== uid) return null;
   if (typeof patch.customDomain === 'string') {
-    patch.customDomain = patch.customDomain.toLowerCase().replace(/^www\./, '').split(':')[0] || null;
+    const domain = patch.customDomain.toLowerCase().replace(/^www\./, '').split(':')[0] || null;
+    if (domain) {
+      // Refuse a domain already claimed by a different page (takeover guard).
+      const clash = await db.collection(COLLECTION).where('customDomain', '==', domain).limit(1).get();
+      if (!clash.empty && clash.docs[0].id !== id) {
+        throw new Error('That domain is already connected to another page.');
+      }
+    }
+    patch.customDomain = domain;
   }
   const extra: Record<string, unknown> = {};
   if (patch.brand?.companyName) extra.brandSlug = toSlug(patch.brand.companyName);

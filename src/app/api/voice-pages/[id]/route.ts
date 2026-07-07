@@ -8,6 +8,9 @@ import { z } from 'zod';
 import { ok, bad, fail, getUidFromRequest } from '@/lib/api-helpers';
 import { deleteVoicePage, updateVoicePage } from '@/services/voice-pages';
 
+// Only these fields are patchable. brand/listing are intentionally excluded:
+// they were free-form maps that the service replaces wholesale, so a partial
+// patch would wipe required fields and break the public page.
 const patchSchema = z.object({
   status: z.enum(['draft', 'published']).optional(),
   locale: z.enum(['en', 'ar']).optional(),
@@ -17,8 +20,6 @@ const patchSchema = z.object({
     .regex(/^[a-zA-Z0-9.-]*$/, 'Invalid domain.')
     .nullable()
     .optional(),
-  listing: z.record(z.any()).optional(),
-  brand: z.record(z.any()).optional(),
 });
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
