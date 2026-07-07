@@ -6,10 +6,14 @@
 import { ok, bad, fail } from '@/lib/api-helpers';
 import { scrapeSite } from '@/lib/whitelabel/scrape';
 import { multiStyles } from '@/ai/flows/whitelabel/multi-styles';
+import { LIMITS, checkRateLimit, requestIp, tooMany } from '@/lib/whitelabel/rate-limit';
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  const rl = await checkRateLimit(`styles:ip:${requestIp(req)}`, LIMITS.stylesPerIpPerHour(), 3600);
+  if (!rl.allowed) return tooMany(rl.retryAfterSec);
+
   let body: { websiteUrl?: string; locale?: string };
   try {
     body = await req.json();

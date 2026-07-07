@@ -14,11 +14,15 @@ import { scrapeSite } from '@/lib/whitelabel/scrape';
 import { seedListings } from '@/lib/whitelabel/seed-listings';
 import { extractBrand } from '@/ai/flows/whitelabel/extract-brand';
 import { createTenant, markTenantLive } from '@/services/tenants';
+import { LIMITS, checkRateLimit, requestIp, tooMany } from '@/lib/whitelabel/rate-limit';
 import type { TenantBrand, TenantListing, TenantLocale } from '@/types';
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  const rl = await checkRateLimit(`provision:ip:${requestIp(req)}`, LIMITS.provisionPerIpPerHour(), 3600);
+  if (!rl.allowed) return tooMany(rl.retryAfterSec);
+
   let body: { companyName?: string; websiteUrl?: string; locale?: string };
   try {
     body = await req.json();

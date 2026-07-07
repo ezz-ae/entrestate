@@ -8,12 +8,16 @@
 import { ok, bad, fail } from '@/lib/api-helpers';
 import { sellerAgent } from '@/ai/flows/whitelabel/seller-agent';
 import { SellerAgentInputSchema } from '@/ai/flows/whitelabel/schemas';
+import { LIMITS, checkRateLimit, requestIp, tooMany } from '@/lib/whitelabel/rate-limit';
 
 export const maxDuration = 30;
 
 const MAX_TURNS = 60;
 
 export async function POST(req: Request) {
+  const rl = await checkRateLimit(`seller:ip:${requestIp(req)}`, LIMITS.sellerTurnsPerIp(), 600);
+  if (!rl.allowed) return tooMany(rl.retryAfterSec);
+
   let raw: unknown;
   try {
     raw = await req.json();

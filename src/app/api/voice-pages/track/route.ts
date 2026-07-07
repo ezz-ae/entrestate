@@ -7,6 +7,7 @@
 import { z } from 'zod';
 import { ok, bad } from '@/lib/api-helpers';
 import { trackVoicePageEvent } from '@/services/voice-pages';
+import { LIMITS, checkRateLimit, requestIp } from '@/lib/whitelabel/rate-limit';
 
 const trackSchema = z.object({
   slug: z.string().min(1).max(64),
@@ -14,6 +15,9 @@ const trackSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const rl = await checkRateLimit(`track:ip:${requestIp(req)}`, LIMITS.trackPerIp(), 600);
+  if (!rl.allowed) return ok({ tracked: false }); // beacons never error loudly
+
   const body = await req.json().catch(() => null);
   const parsed = trackSchema.safeParse(body);
   if (!parsed.success) return bad('Invalid event.');

@@ -8,7 +8,8 @@
 import { z } from 'zod';
 import { ok, bad, fail } from '@/lib/api-helpers';
 import { buyerAgent } from '@/ai/flows/whitelabel/buyer-agent';
-import { addVoicePageLead, getPublishedVoicePageBySlug, recordAgentTurn } from '@/services/voice-pages';
+import { addVoicePageLead, getMonthlyUsage, getPublishedVoicePageBySlug, recordAgentTurn } from '@/services/voice-pages';
+import { LIMITS, checkRateLimit, requestIp, tooMany } from '@/lib/whitelabel/rate-limit';
 
 export const maxDuration = 30;
 
@@ -22,6 +23,9 @@ const turnSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const rl = await checkRateLimit(`buyer:ip:${requestIp(req)}`, LIMITS.buyerTurnsPerIp(), 600);
+  if (!rl.allowed) return tooMany(rl.retryAfterSec);
+
   const body = await req.json().catch(() => null);
   const parsed = turnSchema.safeParse(body);
   if (!parsed.success) return bad('Invalid agent input.');
@@ -30,6 +34,17 @@ export async function POST(req: Request) {
   try {
     const page = await getPublishedVoicePageBySlug(slug);
     if (!page) return bad('Page not found.', 404);
+
+    // Abuse ceiling per ad page, plus the tier quota hook per owner.
+    const pageCap = await checkRateLimit(`buyer:page:${page.id}`, LIMITS.buyerTurnsPerPagePerDay(), 86400);
+    if (!pageCap.allowed) return tooMany(pageCap.retryAfterSec, 'This page is very busy right now. Please try again later.');
+    const monthlyLimit = LIMITS.ownerTurnsPerMonth();
+    if (monthlyLimit > 0) {
+      const usage = await getMonthlyUsage(page.uid);
+      if (usage.voiceTurns >= monthlyLimit) {
+        return tooMany(3600, 'The AI advisor is unavailable right now. Please use the contact details on this page.');
+      }
+    }
 
     const output = await buyerAgent({
       locale,

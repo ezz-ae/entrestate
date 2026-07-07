@@ -53,8 +53,27 @@ their ad at the page URL; captured buyers land in their CRM.
 - The studio "New page" form can prefill from a market project
   (`GET /api/voice-pages/projects?q=` prefix search over `projects_catalog`).
 
+## Rate limits & quotas (shipped)
+
+All public endpoints are limited via a Firestore fixed-window limiter
+(`src/lib/whitelabel/rate-limit.ts`, fails open). Env-tunable knobs:
+
+| Env var | Default | Guards |
+|---|---|---|
+| `WL_PROVISION_IP_HOURLY` | 6 | /pitch tenant provisioning per IP/hour |
+| `WL_SELLER_TURNS_IP_10MIN` | 40 | seller-agent turns per IP/10 min |
+| `WL_BUYER_TURNS_IP_10MIN` | 60 | buyer-agent turns per IP/10 min |
+| `WL_BUYER_TURNS_PAGE_DAILY` | 1000 | turns per voice page per day |
+| `WL_STYLES_IP_HOURLY` | 10 | /styles generations per IP/hour |
+| `WL_TRACK_IP_10MIN` | 120 | analytics beacons per IP/10 min |
+| `WL_OWNER_TURNS_MONTHLY` | 0 (off) | owner's monthly turn quota — set per tier |
+
+When the owner quota is hit the buyer agent politely degrades to the page's
+contact details; the pricing tiers plug in by setting `WL_OWNER_TURNS_MONTHLY`
+per plan (or replacing the env lookup with a per-user plan lookup).
+
 ## Next
 
-- Price the AI tiers off `voiceTurns` and enforce quotas in the agent API.
+- Per-plan quota lookup (replace the global env with the user's tier).
 - Swap browser speech for the hosted voice stack when the kloom source lands.
 - Automated domain provisioning via the hosting API (today: DNS instructions).
