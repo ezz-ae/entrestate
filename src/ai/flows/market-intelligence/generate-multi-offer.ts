@@ -14,6 +14,7 @@
  * @export {type} GenerateMultiOfferOutput - The Zod schema for the output.
  */
 
+import { googleAI } from '@genkit-ai/googleai';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
@@ -43,7 +44,7 @@ const generateMultiOfferPrompt = ai.definePrompt({
     name: 'generateMultiOfferPrompt',
     input: { schema: GenerateMultiOfferInputSchema },
     output: { schema: GenerateMultiOfferOutputSchema },
-    model: 'gemini-1.5-pro-preview',
+    model: googleAI.model('gemini-2.5-flash'),
     prompt: `You are a real estate analyst creating a comparison document.
     Generate a professional, clean, side-by-side comparison PDF document based on the following information.
     The PDF should have a title, a brief summary for the client, and a table comparing the properties based on the specified terms.

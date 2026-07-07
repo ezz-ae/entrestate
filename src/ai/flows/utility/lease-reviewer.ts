@@ -8,6 +8,7 @@
  * to help agents and clients identify areas for concern or negotiation.
  */
 
+import { googleAI } from '@genkit-ai/googleai';
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
@@ -42,7 +43,7 @@ const leaseReviewerPrompt = ai.definePrompt({
   name: 'leaseReviewerPrompt',
   input: { schema: LeaseReviewerInputSchema },
   output: { schema: LeaseReviewerOutputSchema },
-  model: 'gemini-1.5-pro-preview',
+  model: googleAI.model('gemini-2.5-flash'),
   prompt: `
     You are an expert AI paralegal specializing in UAE real estate law. Your task is to review the provided lease agreement from the perspective of the specified user role and identify any non-standard clauses, potential risks, or areas for negotiation.
 
