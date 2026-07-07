@@ -83,6 +83,8 @@ export default function VoicePagesStudio() {
   const [projectQuery, setProjectQuery] = useState('');
   const [projectResults, setProjectResults] = useState<any[]>([]);
   const [searchingProjects, setSearchingProjects] = useState(false);
+  const [selectedProjects, setSelectedProjects] = useState<any[]>([]);
+  const [bulkCreating, setBulkCreating] = useState(false);
 
   const authedFetch = useCallback(
     async (url: string, init: RequestInit = {}) => {
@@ -156,6 +158,57 @@ export default function VoicePagesStudio() {
     }));
     setProjectResults([]);
     setProjectQuery('');
+  };
+
+  const toggleProject = (proj: any) => {
+    setSelectedProjects((sel) =>
+      sel.some((p) => p.id === proj.id)
+        ? sel.filter((p) => p.id !== proj.id)
+        : sel.length < 10
+          ? [...sel, proj]
+          : sel,
+    );
+  };
+
+  const bulkCreate = async () => {
+    if (!selectedProjects.length || !form.companyName.trim()) {
+      toast({
+        title: 'Company name required',
+        description: 'Fill the brand section below, then create the pages.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setBulkCreating(true);
+    try {
+      const res = await authedFetch('/api/voice-pages/bulk', {
+        method: 'POST',
+        body: JSON.stringify({
+          projectIds: selectedProjects.map((p) => p.id),
+          locale: form.locale,
+          brand: {
+            companyName: form.companyName,
+            tagline: form.tagline || undefined,
+            logoUrl: form.logoUrl || null,
+            colors: { primary: form.primary, accent: form.accent },
+            contact: form.phone ? { phone: form.phone } : undefined,
+            locale: form.locale,
+          },
+        }),
+      });
+      setPages((p) => [...res.created, ...p]);
+      setSelectedProjects([]);
+      setProjectResults([]);
+      setProjectQuery('');
+      toast({
+        title: `${res.created.length} pages created`,
+        description: 'Publish each one to get its ad URL.',
+      });
+    } catch (e: any) {
+      toast({ title: 'Bulk create failed', description: e.message, variant: 'destructive' });
+    } finally {
+      setBulkCreating(false);
+    }
   };
 
   const createPage = async (e: React.FormEvent) => {
@@ -297,17 +350,58 @@ export default function VoicePagesStudio() {
             </div>
             {projectResults.length > 0 && (
               <div className="mt-2 space-y-1">
-                {projectResults.map((proj) => (
+                {projectResults.map((proj) => {
+                  const isSelected = selectedProjects.some((p) => p.id === proj.id);
+                  return (
+                    <div
+                      key={proj.id}
+                      className="flex w-full items-center gap-2 rounded-md border bg-background px-3 py-1.5 text-xs"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => prefillFromProject(proj)}
+                        className="min-w-0 flex-1 text-start hover:underline"
+                      >
+                        <span className="font-medium">{proj.name}</span>
+                        <span className="text-muted-foreground"> · {proj.area || proj.city || ''}{proj.developer ? ` · ${proj.developer}` : ''}</span>
+                      </button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={isSelected ? 'default' : 'outline'}
+                        className="h-6 px-2 text-[11px]"
+                        onClick={() => toggleProject(proj)}
+                      >
+                        {isSelected ? 'Selected' : '+ Add'}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {selectedProjects.length > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t pt-3">
+                {selectedProjects.map((proj) => (
                   <button
                     key={proj.id}
                     type="button"
-                    onClick={() => prefillFromProject(proj)}
-                    className="block w-full rounded-md border bg-background px-3 py-1.5 text-start text-xs hover:bg-muted"
+                    onClick={() => toggleProject(proj)}
+                    className="rounded-full border px-2.5 py-1 text-[11px] hover:bg-muted"
+                    title="Remove"
                   >
-                    <span className="font-medium">{proj.name}</span>
-                    <span className="text-muted-foreground"> · {proj.area || proj.city || ''}{proj.developer ? ` · ${proj.developer}` : ''}</span>
+                    {proj.name} ✕
                   </button>
                 ))}
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={bulkCreating}
+                  onClick={bulkCreate}
+                  className="ms-auto"
+                >
+                  {bulkCreating && <Loader2 className="me-1.5 h-3.5 w-3.5 animate-spin" />}
+                  Create {selectedProjects.length} page{selectedProjects.length > 1 ? 's' : ''} with my brand
+                </Button>
               </div>
             )}
           </div>

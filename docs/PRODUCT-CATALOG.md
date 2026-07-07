@@ -23,11 +23,12 @@ page** and personalizes the canvas on the spot (project, budget, language).
 
 ## Inventory & web
 
-### 2. Listing-to-Landing — full market as your site
+### 2. Listing-to-Landing — full market as your site (first cut SHIPPED)
 Every market project becomes a listing + conversion landing page under the
-client's domain/brand. Backed by the market catalog + `api.listings_feed`
-(live in Neon; ORE's landing-page engine is the reference implementation).
-- **Ship:** data feed + branded page renderer per tenant. Medium lift.
+client's brand. First cut live: bulk-select up to 10 `projects_catalog`
+projects in the Voice Pages studio → branded AI voice landing pages in one
+click (`POST /api/voice-pages/bulk`). Next: the full Neon `api.listings_feed`
+as the source + a branded index/site view per client.
 
 ### 3. From-Site Multi-Styles — SHIPPED
 Free tool at `/styles`: paste a site URL → four art directions (faithful,
