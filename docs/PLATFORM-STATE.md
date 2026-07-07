@@ -119,6 +119,20 @@ the same change that added this map (see below).
 - `src/app/me/tool/deals-smart-planner/page.tsx (/me/tool/deals-smart-planner)` — Interactive AI deal-planning genuinely generates each next step from the LLM based on user answers.
 - `src/app/me/workspace/page.tsx (/me/workspace)` — Dashboard shows the user's real saved projects; the apps grid resets on a new device/browser because it lives only in localStorage.
 
+## Remediation progress (this change)
+
+- **`/me/assistant` + global chat were BROKEN** — both POSTed to `/api/chat`,
+  which did not exist; every message errored. Built a real, authenticated,
+  rate-limited `/api/chat` backed by a new grounded assistant flow
+  (`src/ai/flows/utility/assistant-chat-flow.ts`) that answers in the platform
+  voice and routes intent to real tools by id.
+- **Honesty fixes** (stopped the UI lying to paying users):
+  - `/me/flows` no longer claims a built flow is "live and will run"; it says
+    the builder saves a draft and execution is coming.
+  - `/me/community/roadmap` removed the false "all AI tools fully functional"
+    completed item; replaced with the shipped AI Voice Landing Pages.
+  - `/me/clients` now carries a "sample data" banner (`PreviewBanner`).
+
 ## Owner's remediation priority
 1. **Truth in UI first** — replace mock pages (`/me/clients`, `/me/directory`, `/me/flows`, roadmap) with either real data or an honest "coming soon", so the product stops overpromising to paying users.
 2. **The broken assistant** — `/me/assistant` and `global-chat` POST to `/api/chat`, which does not exist; every message errors. Either build `/api/chat` or point them at `/api/run` (now authenticated).

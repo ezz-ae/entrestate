@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal, UserPlus, Eye, Link as LinkIcon } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
+import { PreviewBanner } from '@/components/preview-banner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +55,8 @@ export default function ClientsPage() {
             Add New Client
         </Button>
       </PageHeader>
+
+      <PreviewBanner feature="Client Pages" />
 
       <div className="border rounded-lg w-full">
         <Table>

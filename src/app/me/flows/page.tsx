@@ -118,7 +118,12 @@ export default function FlowsPage() {
         toast({ title: "Incomplete Flow", description: "Please add at least one trigger and select an app for every step.", variant: "destructive"});
         return;
     }
-    toast({ title: "Flow Activated!", description: "This automation is now live and will run when the trigger occurs." });
+    // The Flow Builder is a design surface today; execution is not yet wired.
+    // Do not claim the automation is live — that would be false.
+    toast({
+      title: "Flow saved as a draft",
+      description: "Automated execution is coming soon — we'll run your saved flows once the engine ships.",
+    });
   }
 
   if (!isClient) {
