@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useAuth } from '@/hooks/useAuth';
 import React, { useState } from 'react';
 import { Button } from './button';
 import { Play, Loader2, Mic, FileText, ImageIcon, Video, Bot, BarChart3, Palette, LayoutTemplate, Sparkles } from 'lucide-react';
@@ -21,6 +22,7 @@ export function PromptCard({ prompt }: { prompt: PromptCardProps }) {
     const router = useRouter();
     const { addTab } = useTabManager();
     const { toast } = useToast();
+    const { user } = useAuth();
     
     const icon = icons[iconName] || <Sparkles />;
 
@@ -32,9 +34,11 @@ export function PromptCard({ prompt }: { prompt: PromptCardProps }) {
         try {
             // For prompts that don't need a specific UI, we can run them in the background
             if (payload) {
+                 if (!user) throw new Error('Please sign in to run prompts.');
+                 const idToken = await user.getIdToken();
                  const response = await fetch('/api/run', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                     body: JSON.stringify({ toolId, payload }),
                 });
                 const data = await response.json();

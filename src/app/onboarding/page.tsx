@@ -7,7 +7,6 @@ import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { saveUserData } from '@/services/database';
 
 // Import step components
 import { Step1_MarketFocus } from '@/components/onboarding/Step1_MarketFocus';
@@ -67,8 +66,14 @@ export default function OnboardingPage() {
             }
         };
 
-        // Use the database service to save all data
-        await saveUserData(user.uid, finalData);
+        // Persist via the authenticated API (uid derived from the verified token).
+        const saveToken = await user.getIdToken();
+        const saveRes = await fetch('/api/user/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${saveToken}` },
+            body: JSON.stringify(finalData),
+        });
+        if (!saveRes.ok) throw new Error('Failed to save your workspace. Please try again.');
 
         // Add shortlisted projects to user's library
         if (draft.shortlist && draft.suggestedProjects) {
